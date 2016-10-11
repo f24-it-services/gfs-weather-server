@@ -1,0 +1,44 @@
+{
+  "server": {
+    "port":"8080"
+  },
+  "db": "mongoose",
+  "mongoose": {
+    "connString": "mongodb://localhost/gfs"
+  },
+  "sequelize": {
+    "user": "gfs",
+    "database": "gfs",
+    "password": "foo",
+    "options": {
+      "host": "localhost",
+      "port": 5432,
+      "dialect": "postgres"
+    },
+    "modelOptions": {
+      "schema": "weather",
+      "underscored": true
+    }
+  },
+  "downloader": {
+    "latestUpdate": null,
+    "target": "/tmp/gfs-downloader",
+    "forecastStart": 0,
+    "forecastEnd": 72,
+    "fields": [{
+        "name": ["UGRD", "VGRD"],
+        "combinedName": "UVGRD",
+        "surface": "10 m above ground",
+        "resolution": 1
+      }, {
+        "name": "TMP",
+        "surface": "surface",
+        "resolution": 1
+      }, {
+        "name": "PRATE",
+        "surface": "surface",
+        "process": ["to-regular", 90, 0, 1, 1, 360, 181]
+      }
+    ]
+  }
+}
