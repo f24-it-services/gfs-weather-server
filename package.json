@@ -3,6 +3,10 @@
   "version": "1.0.1",
   "description": "",
   "main": "lib/server.js",
+  "bin": {
+    "gfs-weather-server": "bin/gfs-weather-server.js",
+    "gfs-weather-crond": "bin/gfs-weather-crond.js"
+  },
   "scripts": {
     "start:dev": "NODE_ENV=development DEBUG=gfs* nodemon --watch src -- -r 'babel-register' src/server.js",
     "crond:dev": "NODE_ENV=development DEBUG=gfs* node -r babel-register src/crond.js",
