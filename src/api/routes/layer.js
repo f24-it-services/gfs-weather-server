@@ -15,7 +15,7 @@ function clamp (v, min, max) {
 export default function attach (server) {
   // FIXME move to separate route file
   server.get('/forecast', (req, res, next) => {
-    let layers = req.params.layers
+    let layers = req.query.layers
 
     if (!Array.isArray(layers)) {
       layers = [layers]
@@ -26,9 +26,9 @@ export default function attach (server) {
       return {name, surface}
     })
 
-    let fromDate = new Date(parseInt(req.params.from))
-    let lat = clamp(req.params.lat, -90, 90)
-    let lng = clamp(req.params.lng, -180, 180)
+    let fromDate = new Date(parseInt(req.query.from))
+    let lat = clamp(req.query.lat, -90, 90)
+    let lng = clamp(req.query.lng, -180, 180)
 
     Forecast
     .fetch([lat, lng], layers, fromDate)
@@ -38,10 +38,10 @@ export default function attach (server) {
     }, next)
   })
 
-  server.get('/layer/:name/:date?:bb', (req, res, next) => {
-    debug(`Get layer name=${req.params.name} date=${req.params.date} bounds=${req.params.bb}`)
+  server.get('/layer/:name/:date', (req, res, next) => {
+    debug(`Get layer name=${req.params.name} date=${req.params.date} bounds=${req.query.bb}`)
     let forecastedDate = new Date(parseInt(req.params.date))
-    let bounds = req.params.bb.split(',').map((c) => parseFloat(c))
+    let bounds = req.query.bb.split(',').map((c) => parseFloat(c))
     bounds = [bounds[1], bounds[2], bounds[3], bounds[0]]
 
     GridLoader

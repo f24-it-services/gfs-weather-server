@@ -15,10 +15,10 @@ export default db
 export function bootstrap () {
   switch (Config.get().db) {
     case 'mongoose':
-      Object.assign(db, mongooseBootstrap())
+      Object.assign(db, mongooseBootstrap.apply(undefined, arguments))
       break
     case 'sequelize':
-      Object.assign(db, sequelizeBootstrap())
+      Object.assign(db, sequelizeBootstrap.apply(undefined, arguments))
       break
   }
 

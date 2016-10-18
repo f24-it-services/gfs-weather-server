@@ -10,13 +10,13 @@ const db = {DataSet, Layer, Point}
 
 export default db
 
-export function bootstrap () {
+export function bootstrap (connected) {
   const config = Config.get().mongoose
 
   // Bootstrap mongoose
   // http://mongoosejs.com/docs/promises.html
   mongoose.Promise = global.Promise
-  mongoose.connect(config.connString)
+  !connected && mongoose.connect(config.connString)
 
   db.query = new QueryInterface(db)
 
