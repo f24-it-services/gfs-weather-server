@@ -47,8 +47,9 @@ export default function attach (server) {
     GridLoader
     .fetchGeoJSON(req.params.name, forecastedDate, bounds)
     .then((geoJSON) => {
+      let buff = geobuf.encode(geoJSON, new Pbf())
       res.setHeader('content-type', 'application/x-protobuf')
-      res.send(geobuf.encode(geoJSON, new Pbf()))
+      res.send(new Buffer(buff, 'binary'))
       next()
     }, (err) => {
       debug('error', err)

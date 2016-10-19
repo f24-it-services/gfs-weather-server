@@ -12,7 +12,8 @@
     "crond:dev": "NODE_ENV=development DEBUG=gfs* node -r babel-register src/crond.js",
     "start": "node lib/server.js",
     "crond": "node lib/crond.js",
-    "build": "babel src -d lib"
+    "build": "babel src -d lib",
+    "watch": "npm run build -- --watch"
   },
   "author": "Johannes Klose <jklose@calitrix.com>",
   "license": "MIT",
