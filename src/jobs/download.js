@@ -1,5 +1,5 @@
 import debugFactory from 'debug'
-import {Client, Downloader} from 'gfs-downloader'
+import {Downloader} from 'gfs-downloader'
 import {sequence} from 'gfs-weather-utils'
 import {argv} from 'yargs'
 
@@ -41,7 +41,7 @@ export default function install (schedule) {
       // day and hour
       let date = new Date(Date.parse(argv.date))
       if (isNaN(date.getTime())) {
-        return console.error(`Invalid date ${argv.date}`)
+        return console.error(`Invalid date ${argv.date}`) // eslint-disable-line no-console
       }
       promise = start(date)
     } else {
@@ -101,7 +101,7 @@ export default function install (schedule) {
     // All done, catch errors and/or shutdown
     //
     .then(disconnect, (err) => {
-      console.error(err)
+      console.error(err) // eslint-disable-line no-console
       disconnect()
     })
   })

@@ -35,7 +35,7 @@
   "dependencies": {
     "db-streamer": "^0.4.5",
     "geobuf": "^2.0.0",
-    "gfs-downloader": "^1.0.0",
+    "gfs-downloader": "^1.0.4",
     "gfs-weather-utils": "^1.0.0",
     "glob": "^7.0.5",
     "grib2json": "^1.0.0",
