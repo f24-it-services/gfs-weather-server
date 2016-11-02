@@ -7,11 +7,6 @@ import GridLoader from '../../services/GridLoader'
 
 const debug = debugFactory('gfs.server')
 
-// FIXME move to shared library
-function clamp (v, min, max) {
-  return Math.max(min, Math.min(max, v))
-}
-
 export default function attach (server) {
   // FIXME move to separate route file
   server.get('/forecast', (req, res, next) => {
@@ -27,8 +22,8 @@ export default function attach (server) {
     })
 
     let fromDate = new Date(parseInt(req.query.from))
-    let lat = clamp(req.query.lat, -90, 90)
-    let lng = clamp(req.query.lng, -180, 180)
+    let lat = parseFloat(req.query.lat)
+    let lng = parseFloat(req.query.lng)
 
     Forecast
     .fetch([lat, lng], layers, fromDate)

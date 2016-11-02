@@ -1,18 +1,23 @@
-import {Grid, sequence} from 'gfs-weather-utils'
+import {
+  Grid,
+  sequence,
+  wrapLngLat,
+  wrapLng,
+  wrapLat
+} from 'gfs-weather-utils'
+
 import db from '../db'
 
 export default {
   fetch (latlng, layers, startDate) {
-    let [lat, lng] = latlng
-    let la1 = Math.ceil(lat)
-    let lo1 = Math.floor(lng)
-    let la2 = Math.floor(lat)
-    let lo2 = Math.ceil(lng)
+    let [lng, lat] = wrapLngLat([latlng[1], latlng[0]])
+    let la1 = wrapLat(Math.ceil(lat))
+    let lo1 = wrapLng(Math.floor(lng))
+    let la2 = wrapLat(Math.floor(lat))
+    let lo2 = wrapLng(Math.ceil(lng))
 
-    if (la1 === la2) la2--
-    if (lo1 === lo2) lo2++
-    if (lo1 > 180 || lo1 < -180) lo1 = (lo1 - 360) % 360
-    if (lo2 > 180 || lo2 < -180) lo2 = (lo2 + 360) % 360
+    if (la1 === la2) la2 = wrapLat(la2 - 1)
+    if (lo1 === lo2) lo2 = wrapLng(lo2 + 1)
 
     return db.query.findPointsByCoords(
       {forecastedDate: {$gte: startDate}},
@@ -42,10 +47,11 @@ export default {
             let [lo, la] = p.lnglat.coordinates
             let i = (la1 - la) * 2 + (lo - lo1)
             data[i] = p.value
-            // console.log(i, lo, la, p.value)
+            // console.log(i, lo, la, p.value, lo1, la1)
           })
           let grid = new Grid(0, la1, lo1, 1, 1, 2, 2, data)
-          // console.log(lng, lat, grid.interpolateAt(lat, lng))
+          // console.log(lng, lat)
+          // console.log(grid.interpolateAt(lat, lng))
           layerMap[layerKey(layer)].values[offset] = grid.interpolateAt(lat, lng)
         })
       })

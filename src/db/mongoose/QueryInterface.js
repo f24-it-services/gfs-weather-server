@@ -116,24 +116,17 @@ export default class MongooseQueryInterface extends QueryInterface {
     .then((dataSets) => this.__populatePoints(dataSets, pointCriteria))
   }
 
-  __wrapLngLat ([lng, lat]) {
-    return [
-      lng < -180 ? (lng + 360) % 360 : (lng > 180 ? (lng + 360) % 360 - 360 : lng),
-      lat
-    ]
-  }
-
   findPointsInBounds (dsCriteria, layerCriteria, bounds, fetchOne = false) {
     const pointCriteria = {
       $geoWithin: {
         $geometry: {
           type: 'Polygon',
           coordinates: [[
-            this.__wrapLngLat([bounds[0], bounds[1]]),
-            this.__wrapLngLat([bounds[0], bounds[3]]),
-            this.__wrapLngLat([bounds[2], bounds[3]]),
-            this.__wrapLngLat([bounds[2], bounds[1]]),
-            this.__wrapLngLat([bounds[0], bounds[1]])
+            [bounds[0], bounds[1]],
+            [bounds[0], bounds[3]],
+            [bounds[2], bounds[3]],
+            [bounds[2], bounds[1]],
+            [bounds[0], bounds[1]]
           ]]
         }
       }
