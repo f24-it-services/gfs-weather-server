@@ -20,7 +20,13 @@
       "underscored": true
     }
   },
+  "cleanup": {
+    "schedule": "1 3 * * *",
+    "fileTTL": 172800000,
+    "dataSetTTL": 172800000
+  },
   "downloader": {
+    "schedule": "1 0,12 * * *",
     "latestUpdate": null,
     "target": "/tmp/gfs-downloader",
     "forecastStart": 0,

@@ -8,12 +8,13 @@ import FileSet from '../util/FileSet'
 import Config from '../Config'
 
 const debug = debugFactory('gfs.cron.downloader')
-let downloaderConfig = {}
+let cronConfig = {}
 
 export default function install (schedule) {
-  schedule('* * * * *', () => {
+  cronConfig = Config.get().downloader
+
+  schedule(cronConfig.schedule || '1 0,12 * * *', () => {
     bootstrap()
-    downloaderConfig = Config.get().downloader
 
     /**
      * Utility function to start the downloader process
@@ -21,8 +22,8 @@ export default function install (schedule) {
      * @return {Promise}
      */
     let start = (startDate) => {
-      const config = Object.assign({}, downloaderConfig, {fields: []})
-      downloaderConfig.fields.forEach((field) => {
+      const config = Object.assign({}, cronConfig, {fields: []})
+      cronConfig.fields.forEach((field) => {
         if (typeof field.name === 'string') {
           config.fields.push(field)
         } else {
@@ -116,7 +117,7 @@ function expandDescriptors (field) {
 }
 
 function createTasks (tasks, dataSet, fileSet) {
-  downloaderConfig.fields.forEach((field) => {
+  cronConfig.fields.forEach((field) => {
     if (Array.isArray(field.name)) {
       tasks.push(() => combineFields(field, dataSet, fileSet))
     } else if (field.process && field.process[0] === 'to-regular') {

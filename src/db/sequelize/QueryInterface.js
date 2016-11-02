@@ -141,4 +141,10 @@ export default class SequelizeQueryInterface extends QueryInterface {
 
     return fetchOne ? this.db.DataSet.find(query) : this.db.DataSet.findAll(query)
   }
+
+  cleanupOldDataSets (ttl) {
+    return this.db.DataSet.destroy({
+      where: {forecastedDate: {$lte: new Date(Date.now() - ttl)}}
+    })
+  }
 }

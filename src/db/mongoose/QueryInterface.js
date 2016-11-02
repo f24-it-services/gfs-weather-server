@@ -147,4 +147,29 @@ export default class MongooseQueryInterface extends QueryInterface {
 
     return this.__findPoints(dsCriteria, layerCriteria, pointCriteria, fetchOne)
   }
+
+  cleanupOldDataSets (ttl) {
+    return this.db.DataSet.find({
+      forecastedDate: {$lte: new Date(Date.now() - ttl)}
+    })
+    .populate('layers')
+    .then((dataSets) => {
+      if (!dataSets) return
+
+      let layerIds = []
+      let dsIds = []
+      dataSets.forEach((dataSet) => {
+        dsIds.push(dataSet._id)
+        dataSet.layers.forEach((layer) => {
+          layerIds.push(layer._id)
+        })
+      })
+
+      return this.db.Point.remove({
+        layer: {$in: layerIds}
+      })
+      .then(() => this.db.Layer.remove({_id: {$in: layerIds}}))
+      .then(() => this.db.DataSet.remove({_id: {$in: dsIds}}))
+    })
+  }
 }
