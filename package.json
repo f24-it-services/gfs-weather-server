@@ -1,6 +1,6 @@
 {
   "name": "gfs-weather-server",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Backend for downloading, storing and serving meteorological data.",
   "main": "lib/server.js",
   "bin": {
