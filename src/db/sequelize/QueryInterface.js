@@ -117,7 +117,12 @@ export default class SequelizeQueryInterface extends QueryInterface {
   }
 
   findPointsByCoords (dsCriteria, layerCriteria, points, fetchOne = false) {
-    let pointsList = points.map(([lng, lat]) => `(${lng} ${lat})`).join(',')
+    let args = []
+    let where = points.map(([lng, lat]) => {
+      args.push(lng, lat)
+      return `(ST_X(lnglat) = ? AND ST_Y(lnglat) = ?)`
+    })
+    .join(' OR ')
 
     let query = {
       where: dsCriteria,
@@ -128,7 +133,7 @@ export default class SequelizeQueryInterface extends QueryInterface {
         include: [{
           model: this.db.Point,
           as: 'points',
-          where: [`lnglat @ ?::geometry`, [`MULTIPOINT(${pointsList})`]]
+          where: [`(${where})`].concat(args)
         }]
       }],
       order: [['forecastedDate', 'ASC']]
