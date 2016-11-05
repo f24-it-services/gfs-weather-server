@@ -3,107 +3,92 @@ import {Downloader} from 'gfs-downloader'
 import {sequence} from 'gfs-weather-utils'
 import {argv} from 'yargs'
 
-import db, {bootstrap, disconnect} from '../db'
+import db from '../db'
 import FileSet from '../util/FileSet'
-import Config from '../Config'
 
 const debug = debugFactory('gfs.cron.downloader')
-let cronConfig = {}
 
-export default function install (schedule) {
-  cronConfig = Config.get().downloader
-
-  schedule(cronConfig.schedule || '1 0,12 * * *', () => {
-    bootstrap()
-
-    /**
-     * Utility function to start the downloader process
-     * @param  {Date} startDate
-     * @return {Promise}
-     */
-    let start = (startDate) => {
-      const config = Object.assign({}, cronConfig, {fields: []})
-      cronConfig.fields.forEach((field) => {
-        if (typeof field.name === 'string') {
-          config.fields.push(field)
-        } else {
-          config.fields.push.apply(config.fields, expandDescriptors(field))
-        }
-      })
-      // config.client = new Client('http://mirror:9090/')
-      return new Downloader(config).update(startDate)
-    }
-
-    // Start the updated based on either the date given via CLI or the newest
-    // previously loaded data set
-    let promise
-    if (argv.date) {
-      // If a date is given via CLI, we look for a data set matching the given
-      // day and hour
-      let date = new Date(Date.parse(argv.date))
-      if (isNaN(date.getTime())) {
-        return console.error(`Invalid date ${argv.date}`) // eslint-disable-line no-console
+export default function download (options) {
+  /**
+   * Utility function to start the downloader process
+   * @param  {Date} startDate
+   * @return {Promise}
+   */
+  let start = (startDate) => {
+    const config = Object.assign({}, options, {fields: []})
+    options.fields.forEach((field) => {
+      if (typeof field.name === 'string') {
+        config.fields.push(field)
+      } else {
+        config.fields.push.apply(config.fields, expandDescriptors(field))
       }
-      promise = start(date)
-    } else {
-      //
-      // Fetch the date of the latest update from the database. We use the
-      // generated date here, i.e. the date the previously loaded forecast(s)
-      // where updated by the GFS
-      promise = db.query.findLatestGeneratedDate()
-      .then((date) => {
-        return start(null, date)
-      })
-    }
-
-    //
-    // If updated forecasts are found, create the new datasets first
-    //
-    promise.then(([files, generatedDate]) => {
-      if (files === null) {
-        return debug('No new files found')
-      }
-      let dataSets = {}
-
-      files.forEach((file) => {
-        if (!dataSets[file.forecast]) {
-          dataSets[file.forecast] = []
-        }
-
-        dataSets[file.forecast].push(file)
-      })
-
-      return sequence(Object.keys(dataSets).map((forecast) => () => {
-        debug(`Creating dataset for date=${generatedDate} forecast=${forecast}`)
-        let values = {
-          generatedDate,
-          forecastedDate: new Date(+generatedDate + forecast * 3600000)
-        }
-        return db.query.findOrUpsertDataSet(values)
-        .then((dataSet) => {
-          return [dataSet, new FileSet(dataSets[forecast])]
-        })
-      }))
-      //
-      // After the datasets are created, we can run all the different layer
-      // import and conversion tasks
-      //
-      .then((dataSets) => {
-        let tasks = []
-
-        dataSets.forEach(([dataSet, fileSet]) => {
-          createTasks(tasks, dataSet, fileSet)
-        })
-
-        return sequence(tasks, false)
-      })
     })
+    // config.client = new Client('http://mirror:9090/')
+    return new Downloader(config).update(startDate)
+  }
+
+  // Start the updated based on either the date given via CLI or the newest
+  // previously loaded data set
+  let promise
+  if (argv.date) {
+    // If a date is given via CLI, we look for a data set matching the given
+    // day and hour
+    let date = new Date(Date.parse(argv.date))
+    if (isNaN(date.getTime())) {
+      return console.error(`Invalid date ${argv.date}`) // eslint-disable-line no-console
+    }
+    promise = start(date)
+  } else {
     //
-    // All done, catch errors and/or shutdown
+    // Fetch the date of the latest update from the database. We use the
+    // generated date here, i.e. the date the previously loaded forecast(s)
+    // where updated by the GFS
+    promise = db.query.findLatestGeneratedDate()
+    .then((date) => {
+      return start(null, date)
+    })
+  }
+
+  //
+  // If updated forecasts are found, create the new datasets first
+  //
+  return promise.then(([files, generatedDate]) => {
+    if (files === null) {
+      return debug('No new files found')
+    }
+    let dataSets = {}
+
+    files.forEach((file) => {
+      if (!dataSets[file.forecast]) {
+        dataSets[file.forecast] = []
+      }
+
+      dataSets[file.forecast].push(file)
+    })
+
+    return sequence(Object.keys(dataSets).map((forecast) => () => {
+      debug(`Creating dataset for date=${generatedDate} forecast=${forecast}`)
+      let values = {
+        generatedDate,
+        forecastedDate: new Date(+generatedDate + forecast * 3600000)
+      }
+      return db.query.findOrUpsertDataSet(values)
+      .then((dataSet) => {
+        return [dataSet, new FileSet(dataSets[forecast])]
+      })
+    }))
     //
-    .then(disconnect, (err) => {
-      console.error(err) // eslint-disable-line no-console
-      disconnect()
+    // After the datasets are created, we can run all the different layer
+    // import and conversion tasks
+    //
+    .then((dataSets) => {
+      let tasks = []
+
+      dataSets.forEach(([dataSet, fileSet]) => {
+        createTasks(tasks, dataSet, fileSet, options.fields)
+      })
+
+      return sequence(tasks, false)
     })
   })
 }
@@ -116,8 +101,8 @@ function expandDescriptors (field) {
   return fields
 }
 
-function createTasks (tasks, dataSet, fileSet) {
-  cronConfig.fields.forEach((field) => {
+function createTasks (tasks, dataSet, fileSet, fields) {
+  fields.forEach((field) => {
     if (Array.isArray(field.name)) {
       tasks.push(() => combineFields(field, dataSet, fileSet))
     } else if (field.process && field.process[0] === 'to-regular') {

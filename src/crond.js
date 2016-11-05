@@ -1,9 +1,10 @@
 import cron from 'node-cron'
-import glob from 'glob'
-import path from 'path'
 import {argv} from 'yargs'
+import cp from 'child_process'
+import path from 'path'
 
 import Config from './Config'
+import {bootstrap, disconnect} from './db'
 
 // Setup configuration
 let config
@@ -11,20 +12,32 @@ if (argv.config) config = require(path.resolve(argv.config))
 else config = require(path.resolve(process.cwd(), 'config.json'))
 
 Config.set(config)
+bootstrap()
 
 if (argv.runOnce) {
-  let fileName = path.join(__dirname, 'jobs', argv.runOnce)
-  let install = require(fileName)
-  ;(install.default || install)((pattern, taskFn) => taskFn())
+  runJob(argv.runOnce)
 } else {
-  glob(path.join(__dirname, 'jobs', '*.js'), (err, res) => {
-    if (err) return console.error(err)
+  Object.keys(config.crontab).forEach((name) => {
+    let {schedule} = config.crontab[name]
+    cron.schedule(schedule, () => runInChild(name))
+  })
+}
 
-    res.forEach((file) => {
-      let install = require(file)
-      ;(install.default || install)(
-        (pattern, taskFn) => cron.schedule(pattern, taskFn)
-      )
-    })
+function runInChild (name) {
+  let cmd = process.argv[0]
+  let args = process.argv.slice(1)
+  args.push('--run-once', name)
+
+  console.log(`${new Date()} run ${cmd} ${args.join(' ')}`)
+  cp.spawn(cmd, args, {stdio: 'inherit'})
+}
+
+function runJob (name) {
+  let {options} = config.crontab[name]
+  let fn = require(`../src/jobs/${name}`)
+
+  return (fn.default || fn)(options).then(disconnect, (err) => {
+    console.error(err)
+    disconnect()
   })
 }

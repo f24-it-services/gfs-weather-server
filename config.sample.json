@@ -20,31 +20,37 @@
       "underscored": true
     }
   },
-  "cleanup": {
-    "schedule": "1 3 * * *",
-    "fileTTL": 172800000,
-    "dataSetTTL": 172800000
-  },
-  "downloader": {
-    "schedule": "1 0,12 * * *",
-    "latestUpdate": null,
-    "target": "/tmp/gfs-downloader",
-    "forecastStart": 0,
-    "forecastEnd": 72,
-    "fields": [{
-        "name": ["UGRD", "VGRD"],
-        "combinedName": "UVGRD",
-        "surface": "10 m above ground",
-        "resolution": 1
-      }, {
-        "name": "TMP",
-        "surface": "surface",
-        "resolution": 1
-      }, {
-        "name": "PRATE",
-        "surface": "surface",
-        "process": ["to-regular", 90, 0, 1, 1, 360, 181]
+  "crontab": {
+    "cleanup": {
+      "schedule": "1 3 * * *",
+      "options": {
+        "fileTTL": 172800000,
+        "dataSetTTL": 172800000,
+        "downloaderTarget": "/tmp/gfs-downloader"
       }
-    ]
+    },
+    "download": {
+      "schedule": "1 0,12 * * *",
+      "options": {
+        "latestUpdate": null,
+        "target": "/tmp/gfs-downloader",
+        "forecastStart": 0,
+        "forecastEnd": 72,
+        "fields": [{
+          "name": ["UGRD", "VGRD"],
+          "combinedName": "UVGRD",
+          "surface": "10 m above ground",
+          "resolution": 1
+        }, {
+          "name": "TMP",
+          "surface": "surface",
+          "resolution": 1
+        }, {
+          "name": "PRATE",
+          "surface": "surface",
+          "process": ["to-regular", 90, 0, 1, 1, 360, 181]
+        }
+      ]}
+    }
   }
 }

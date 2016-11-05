@@ -2,7 +2,7 @@
   "name": "gfs-weather-server",
   "version": "1.1.0",
   "description": "Backend for downloading, storing and serving meteorological data.",
-  "main": "lib/server.js",
+  "main": "lib/index.js",
   "bin": {
     "gfs-weather-server": "bin/gfs-weather-server.js",
     "gfs-weather-crond": "bin/gfs-weather-crond.js"
