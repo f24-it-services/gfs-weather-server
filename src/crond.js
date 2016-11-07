@@ -34,7 +34,7 @@ function runInChild (name) {
 
 function runJob (name) {
   let {options} = config.crontab[name]
-  let fn = require(`../src/jobs/${name}`)
+  let fn = require(`./jobs/${name}`)
 
   return (fn.default || fn)(options).then(disconnect, (err) => {
     console.error(err)
