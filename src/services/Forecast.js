@@ -8,6 +8,8 @@ import {
 
 import db from '../db'
 
+const INTERVAL = 3
+
 export default {
   fetch (latlng, layers, startDate) {
     let [lng, lat] = wrapLngLat([latlng[1], latlng[0]])
@@ -35,7 +37,8 @@ export default {
         }
       })
 
-      dataSets.forEach((dataSet, offset) => {
+      dataSets.forEach((dataSet) => {
+        let offset = Math.floor((dataSet.forecastedDate.getTime() - startDate.getTime()) / (INTERVAL * 3600000))
         // Initialize all values at the current forecast offset with nulls
         layers.forEach((layer) => {
           layerMap[layerKey(layer)].values[offset] = null
@@ -58,7 +61,7 @@ export default {
 
       return {
         start: startDate,
-        interval: 3,
+        interval: INTERVAL,
         position: {
           type: 'Point',
           coordinates: [lng, lat]
