@@ -95,8 +95,8 @@ export default class SequelizeQueryInterface extends QueryInterface {
     })
   }
 
-  findPointsInBounds (dsCriteria, layerCriteria, bounds, fetchOne = false) {
-    let [swLng, swLat, neLng, neLat] = bounds
+  findGrid (dsCriteria, layerCriteria, bounds, sampleFactor) {
+    let [nwLng, nwLat, seLng, seLat] = bounds
 
     let query = {
       where: dsCriteria,
@@ -107,13 +107,20 @@ export default class SequelizeQueryInterface extends QueryInterface {
         include: [{
           model: this.db.Point,
           as: 'points',
-          where: [`lnglat && ?::geography`, [`POLYGON((${swLng} ${swLat},${swLng} ${neLat},${neLng} ${neLat},${neLng} ${swLat},${swLng} ${swLat}))`]]
+          where: [`lnglat && ?::geography AND MOD(ST_X(lnglat)::numeric, ?) = 0 AND MOD(ST_Y(lnglat)::numeric, ?) = 0`, `POLYGON((${nwLng} ${nwLat},${seLng} ${nwLat},${seLng} ${seLat},${nwLng} ${seLat},${nwLng} ${nwLat}))`, sampleFactor, sampleFactor]
         }]
       }],
       order: [['forecastedDate', 'ASC']]
     }
 
-    return fetchOne ? this.db.DataSet.find(query) : this.db.DataSet.findAll(query)
+    return this.db.DataSet.find(query).then((dataSet) => {
+      return {
+        dx: sampleFactor,
+        dy: sampleFactor,
+        bounds: [nwLng, nwLat, seLng, seLat],
+        points: dataSet.layers[0].points
+      }
+    })
   }
 
   findPointsByCoords (dsCriteria, layerCriteria, points, fetchOne = false) {

@@ -11,8 +11,8 @@ export default class QueryInterface {
     throw new Error('Must implement findOrUpsertLayer()')
   }
 
-  findPointsInBounds (dsCriteria, layerCriteria, bounds, fetchOne = false) {
-    throw new Error('Must implement findPointsInBounds()')
+  findGrid (dsCriteria, layerCriteria, bounds, sampleFactor) {
+    throw new Error('Must implement findGrid()')
   }
 
   findPointsByCoords (dsCriteria, layerCriteria, points, fetchOne = false) {

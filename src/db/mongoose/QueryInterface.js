@@ -116,23 +116,85 @@ export default class MongooseQueryInterface extends QueryInterface {
     .then((dataSets) => this.__populatePoints(dataSets, pointCriteria))
   }
 
-  findPointsInBounds (dsCriteria, layerCriteria, bounds, fetchOne = false) {
-    const pointCriteria = {
+  findGrid (dsCriteria, layerCriteria, bounds, sampleFactor) {
+    let [nwLng, nwLat, seLng, seLat] = bounds
+
+    if (seLng - nwLng >= 360) {
+      // Edge case where the bounding box covers the whole globe
+      nwLng = -180
+      seLng = 180
+    }
+
+    return this.db.DataSet
+    .findOne(dsCriteria)
+    .populate({
+      path: 'layers',
+      match: layerCriteria
+    })
+    .sort({forecastedDate: 1})
+    .then((dataSet) => {
+      if (dataSet) {
+        return dataSet.layers[0]
+      }
+    })
+    .then((layer) => {
+      let query
+
+      if (nwLng > 0 && seLng < 0) {
+        // Bounding box goes over dateline, need to split into two boxes
+        query = {
+          $or: [{
+            layer: layer._id,
+            lnglat: this.__withinBounds(nwLng, nwLat, 180, seLat)
+          }, {
+            layer: layer._id,
+            lnglat: this.__withinBounds(-180, nwLat, seLng, seLat)
+          }]
+        }
+      } else {
+        query = {
+          layer: layer._id,
+          lnglat: this.__withinBounds(nwLng, nwLat, seLng, seLat)
+        }
+      }
+
+      return this.db.Point.find({
+        ...query,
+        $and: [
+          {'lnglat.coordinates.0': {$mod: [sampleFactor, 0]}},
+          {'lnglat.coordinates.1': {$mod: [sampleFactor, 0]}}
+        ]
+      })
+    })
+    .then((points) => ({
+      dx: sampleFactor,
+      dy: sampleFactor,
+      bounds: [nwLng, nwLat, seLng, seLat],
+      points
+    }))
+  }
+
+  __withinBounds (nwLng, nwLat, seLng, seLat) {
+    return {
       $geoWithin: {
         $geometry: {
           type: 'Polygon',
           coordinates: [[
-            [bounds[0], bounds[1]],
-            [bounds[0], bounds[3]],
-            [bounds[2], bounds[3]],
-            [bounds[2], bounds[1]],
-            [bounds[0], bounds[1]]
-          ]]
+            [nwLng, nwLat],
+            [nwLng, seLat],
+            [seLng, seLat],
+            [seLng, nwLat],
+            [nwLng, nwLat]
+          ]],
+          crs: {
+            type: 'name',
+            properties: {
+              name: 'urn:x-mongodb:crs:strictwinding:EPSG:4326'
+            }
+          }
         }
       }
     }
-
-    return this.__findPoints(dsCriteria, layerCriteria, pointCriteria, fetchOne)
   }
 
   findPointsByCoords (dsCriteria, layerCriteria, points, fetchOne = false) {

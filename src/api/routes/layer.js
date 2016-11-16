@@ -37,10 +37,9 @@ export default function attach (server) {
     debug(`Get layer name=${req.params.name} date=${req.params.date} bounds=${req.query.bb}`)
     let forecastedDate = new Date(parseInt(req.params.date))
     let bounds = req.query.bb.split(',').map((c) => parseFloat(c))
-    bounds = [bounds[1], bounds[2], bounds[3], bounds[0]]
 
     GridLoader
-    .fetchGeoJSON(req.params.name, forecastedDate, bounds)
+    .fetchGeoJSON(req.params.name, forecastedDate, bounds, parseInt(req.query.sf))
     .then((geoJSON) => {
       let buff = geobuf.encode(geoJSON, new Pbf())
       res.setHeader('content-type', 'application/x-protobuf')
