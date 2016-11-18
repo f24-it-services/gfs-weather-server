@@ -1,53 +1,9 @@
-import Pbf from 'pbf'
-import geobuf from 'geobuf'
-import debugFactory from 'debug'
+import {cacheControl, forecast, layer, sendJson, sendError, sendBuffer, sendErrorBuffer} from '../middleware'
 
-import Forecast from '../../services/Forecast'
-import GridLoader from '../../services/GridLoader'
-
-const debug = debugFactory('gfs.server')
+const CACHE_CONTROL_MAX_AGE = 3 * 3600 // 3hours
 
 export default function attach (server) {
-  // FIXME move to separate route file
-  server.get('/forecast', (req, res, next) => {
-    let layers = req.query.layers
+  server.get('/forecast', forecast, cacheControl(CACHE_CONTROL_MAX_AGE), sendJson, sendError)
 
-    if (!Array.isArray(layers)) {
-      layers = [layers]
-    }
-
-    layers = layers.map((layer) => {
-      let [name, surface] = layer.split('@')
-      return {name, surface}
-    })
-
-    let fromDate = new Date(parseInt(req.query.from))
-    let lat = parseFloat(req.query.lat)
-    let lng = parseFloat(req.query.lng)
-
-    Forecast
-    .fetch([lat, lng], layers, fromDate)
-    .then((result) => {
-      res.send(result)
-      next()
-    }, next)
-  })
-
-  server.get('/layer/:name/:date', (req, res, next) => {
-    debug(`Get layer name=${req.params.name} date=${req.params.date} bounds=${req.query.bb}`)
-    let forecastedDate = new Date(parseInt(req.params.date))
-    let bounds = req.query.bb.split(',').map((c) => parseFloat(c))
-
-    GridLoader
-    .fetchGeoJSON(req.params.name, forecastedDate, bounds, parseInt(req.query.sf))
-    .then((geoJSON) => {
-      let buff = geobuf.encode(geoJSON, new Pbf())
-      res.setHeader('content-type', 'application/x-protobuf')
-      res.send(new Buffer(buff, 'binary'))
-      next()
-    }, (err) => {
-      debug('error', err)
-      next(err)
-    })
-  })
+  server.get('/layer/:name/:date', layer, cacheControl(CACHE_CONTROL_MAX_AGE), sendBuffer, sendErrorBuffer)
 }
