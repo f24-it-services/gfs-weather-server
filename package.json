@@ -13,7 +13,8 @@
     "start": "node lib/server.js",
     "crond": "node lib/crond.js",
     "build": "babel src -d lib",
-    "watch": "npm run build -- --watch"
+    "watch": "npm run build -- --watch",
+    "lint": "eslint '**/*.js'"
   },
   "author": "Johannes Klose <jklose@calitrix.com>",
   "license": "MIT",
