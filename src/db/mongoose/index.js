@@ -16,7 +16,7 @@ export function bootstrap (connected) {
   // Bootstrap mongoose
   // http://mongoosejs.com/docs/promises.html
   mongoose.Promise = global.Promise
-  !connected && mongoose.connect(config.connString)
+  !connected && mongoose.connect(config.connString, config.options)
 
   db.query = new QueryInterface(db)
 

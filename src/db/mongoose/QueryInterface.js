@@ -133,9 +133,8 @@ export default class MongooseQueryInterface extends QueryInterface {
     })
     .sort({forecastedDate: 1})
     .then((dataSet) => {
-      if (dataSet) {
-        return dataSet.layers[0]
-      }
+      if (!dataSet || !dataSet.layers || !dataSet.layers[0]) throw new Error('no DataSet found')
+      return dataSet.layers[0]
     })
     .then((layer) => {
       let query

@@ -12,7 +12,7 @@ export default {
 
   set (newConfig) {
     if (config) {
-      throw new Error('Configuration alreeady set.')
+      throw new Error('Configuration already set.')
     }
     config = newConfig
   },
