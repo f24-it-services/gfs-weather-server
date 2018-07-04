@@ -7,7 +7,7 @@ import GridLoader from '../../services/GridLoader'
 
 const debug = debugFactory('gfs.server')
 
-const EMPTY_GEOJSON_BUFFER = new Buffer(geobuf.encode({
+const EMPTY_GEOJSON_BUFFER = Buffer.from(geobuf.encode({
   type: 'FeatureCollection',
   features: []
 }, new Pbf()), 'binary')
@@ -32,11 +32,11 @@ export function forecast (req, res, next) {
   let lng = parseFloat(req.query.lng)
 
   Forecast
-  .fetch([lat, lng], layers, fromDate)
-  .then((result) => {
-    res.body = result
-    next()
-  }, next)
+    .fetch([lat, lng], layers, fromDate)
+    .then((result) => {
+      res.body = result
+      next()
+    }, next)
 }
 
 /**
@@ -49,14 +49,14 @@ export function layer (req, res, next) {
   let bounds = req.query.bb.split(',').map((c) => parseFloat(c))
 
   GridLoader
-  .fetchGeoJSON(req.params.name, forecastedDate, bounds, parseInt(req.query.sf))
-  .then((geoJSON) => {
-    res.body = geoJSON || {}
-    next()
-  }, (err) => {
-    debug('error', err)
-    next(err)
-  })
+    .fetchGeoJSON(req.params.name, forecastedDate, bounds, parseInt(req.query.sf))
+    .then((geoJSON) => {
+      res.body = geoJSON || {}
+      next()
+    }, (err) => {
+      debug('error', err)
+      next(err)
+    })
 }
 
 export function cacheControl (maxAge) {
@@ -69,7 +69,7 @@ export function cacheControl (maxAge) {
 export function sendBuffer (req, res, next) {
   let buff = geobuf.encode(res.body, new Pbf())
   res.setHeader('Content-Type', 'application/x-protobuf')
-  res.send(new Buffer(buff, 'binary'))
+  res.send(Buffer.from(buff, 'binary'))
   next && next()
 }
 

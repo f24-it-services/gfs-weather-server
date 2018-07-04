@@ -11,7 +11,7 @@ export default class FileSet {
 
   selectMany (...descriptors) {
     return sequence(descriptors.map((d) => () => this.select(d)))
-    .then((grids) => new GridSet(grids))
+      .then((grids) => new GridSet(grids))
   }
 
   select (descriptor) {

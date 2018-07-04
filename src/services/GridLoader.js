@@ -13,28 +13,28 @@ export default {
     bounds[3] = wrapLat(bounds[3])
 
     return db.query.findGrid({forecastedDate}, {name: layerName}, bounds, sampleFactor)
-    .then((grid) => {
-      let features = grid.points.map((point) => ({
-        type: 'Feature',
-        geometry: point.lnglat.toJSON ? point.lnglat.toJSON() : point.lnglat,
-        properties: {
-          value: point.value
-        }
-      }))
-      features.unshift({
-        type: 'Feature',
-        geometry: [0, 0],
-        properties: {
-          dx: grid.dx,
-          dy: grid.dy,
-          bounds: grid.bounds
+      .then((grid) => {
+        let features = grid.points.map((point) => ({
+          type: 'Feature',
+          geometry: point.lnglat.toJSON ? point.lnglat.toJSON() : point.lnglat,
+          properties: {
+            value: point.value
+          }
+        }))
+        features.unshift({
+          type: 'Feature',
+          geometry: [0, 0],
+          properties: {
+            dx: grid.dx,
+            dy: grid.dy,
+            bounds: grid.bounds
+          }
+        })
+        return {
+          type: 'FeatureCollection',
+          features: features
         }
       })
-      return {
-        type: 'FeatureCollection',
-        features: features
-      }
-    })
 
     // return db.query.findPointsInBounds({forecastedDate}, {name: layerName}, bounds, true)
     // .then((dataSet) => {

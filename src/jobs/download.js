@@ -44,9 +44,9 @@ export default function download (options) {
     // generated date here, i.e. the date the previously loaded forecast(s)
     // where updated by the GFS
     promise = db.query.findLatestGeneratedDate()
-    .then((date) => {
-      return start(null, date)
-    })
+      .then((date) => {
+        return start(null, date)
+      })
   }
 
   //
@@ -73,23 +73,23 @@ export default function download (options) {
         forecastedDate: new Date(+generatedDate + forecast * 3600000)
       }
       return db.query.findOrUpsertDataSet(values)
-      .then((dataSet) => {
-        return [dataSet, new FileSet(dataSets[forecast])]
-      })
+        .then((dataSet) => {
+          return [dataSet, new FileSet(dataSets[forecast])]
+        })
     }))
     //
     // After the datasets are created, we can run all the different layer
     // import and conversion tasks
     //
-    .then((dataSets) => {
-      let tasks = []
+      .then((dataSets) => {
+        let tasks = []
 
-      dataSets.forEach(([dataSet, fileSet]) => {
-        createTasks(tasks, dataSet, fileSet, options.fields)
+        dataSets.forEach(([dataSet, fileSet]) => {
+          createTasks(tasks, dataSet, fileSet, options.fields)
+        })
+
+        return sequence(tasks, false)
       })
-
-      return sequence(tasks, false)
-    })
   })
 }
 
@@ -122,11 +122,11 @@ function importField (field, dataSet, fileSet) {
 
 function combineFields (field, dataSet, fileSet) {
   return fileSet.selectMany.apply(fileSet, expandDescriptors(field))
-  .then((grids) => {
-    debug(`Combine ${field.name} to ${field.combinedName}`)
-    const descriptor = Object.assign({}, field, {name: field.combinedName})
-    return db.query.findOrUpsertLayer(dataSet, descriptor, grids.combine())
-  })
+    .then((grids) => {
+      debug(`Combine ${field.name} to ${field.combinedName}`)
+      const descriptor = Object.assign({}, field, {name: field.combinedName})
+      return db.query.findOrUpsertLayer(dataSet, descriptor, grids.combine())
+    })
 }
 
 function convertGrid (field, dataSet, fileSet) {

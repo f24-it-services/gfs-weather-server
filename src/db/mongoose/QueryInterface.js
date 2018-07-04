@@ -8,11 +8,11 @@ export default class MongooseQueryInterface extends QueryInterface {
 
   findLatestGeneratedDate () {
     return this.db.DataSet
-    .findOne()
-    .sort({generatedDate: -1})
-    .then((res) => {
-      return res && res.generatedDate
-    })
+      .findOne()
+      .sort({generatedDate: -1})
+      .then((res) => {
+        return res && res.generatedDate
+      })
   }
 
   findOrUpsertDataSet (values) {
@@ -37,7 +37,7 @@ export default class MongooseQueryInterface extends QueryInterface {
         {upsert: true, new: true, passRawResult: true},
         (err, layer, res) => {
           if (err) return reject(err)
-          if (res.lastErrorObject.updatedExisting) {
+          if (res && res.lastErrorObject && res.lastErrorObject.updatedExisting) {
             resolve(layer)
           } else {
             dataSet.layers.push(layer)
@@ -49,19 +49,19 @@ export default class MongooseQueryInterface extends QueryInterface {
         }
       )
     })
-    .then((layer) => {
-      return this.db.Point.remove({layer: layer._id})
-      .then(() => layer)
-    })
-    .then((layer) =>
-      this.db.Point.collection.insert(
-        grid.map((value, x, y) => ({
-          layer: layer._id,
-          lnglat: {type: 'Point', coordinates: grid.lnglat(x, y)},
-          value: value
-        }))
+      .then((layer) => {
+        return this.db.Point.remove({layer: layer._id})
+          .then(() => layer)
+      })
+      .then((layer) =>
+        this.db.Point.collection.insert(
+          grid.map((value, x, y) => ({
+            layer: layer._id,
+            lnglat: {type: 'Point', coordinates: grid.lnglat(x, y)},
+            value: value
+          }))
+        )
       )
-    )
   }
 
   __populatePoints (dataSets, criteria) {
@@ -72,10 +72,10 @@ export default class MongooseQueryInterface extends QueryInterface {
     }
 
     ;(Array.isArray(dataSets) ? dataSets : [dataSets])
-    .forEach((dataSet) => dataSet.layers.forEach((layer) => {
-      map[layer._id] = layer
-      layer.points = []
-    }))
+      .forEach((dataSet) => dataSet.layers.forEach((layer) => {
+        map[layer._id] = layer
+        layer.points = []
+      }))
 
     let withLayers
     if (Array.isArray(criteria)) {
@@ -93,14 +93,14 @@ export default class MongooseQueryInterface extends QueryInterface {
     }
 
     return this.db.Point.find(withLayers)
-    .then((points) => {
-      points.forEach((point) => {
-        let layer = map[point.layer]
-        if (!layer.points) layer.points = []
-        layer.points.push(point)
+      .then((points) => {
+        points.forEach((point) => {
+          let layer = map[point.layer]
+          if (!layer.points) layer.points = []
+          layer.points.push(point)
+        })
+        return dataSets
       })
-      return dataSets
-    })
   }
 
   __findPoints (dsCriteria, layerCriteria, pointCriteria, fetchOne = false) {
@@ -108,12 +108,12 @@ export default class MongooseQueryInterface extends QueryInterface {
       ? this.db.DataSet.findOne(dsCriteria)
       : this.db.DataSet.find(dsCriteria)
     )
-    .populate({
-      path: 'layers',
-      match: layerCriteria
-    })
-    .sort({forecastedDate: 1})
-    .then((dataSets) => this.__populatePoints(dataSets, pointCriteria))
+      .populate({
+        path: 'layers',
+        match: layerCriteria
+      })
+      .sort({forecastedDate: 1})
+      .then((dataSets) => this.__populatePoints(dataSets, pointCriteria))
   }
 
   findGrid (dsCriteria, layerCriteria, bounds, sampleFactor) {
@@ -126,51 +126,51 @@ export default class MongooseQueryInterface extends QueryInterface {
     }
 
     return this.db.DataSet
-    .findOne(dsCriteria)
-    .populate({
-      path: 'layers',
-      match: layerCriteria
-    })
-    .sort({forecastedDate: 1})
-    .then((dataSet) => {
-      if (!dataSet || !dataSet.layers || !dataSet.layers[0]) throw new Error('no DataSet found')
-      return dataSet.layers[0]
-    })
-    .then((layer) => {
-      let query
-
-      if (nwLng > 0 && seLng < 0) {
-        // Bounding box goes over dateline, need to split into two boxes
-        query = {
-          $or: [{
-            layer: layer._id,
-            lnglat: this.__withinBounds(nwLng, nwLat, 180, seLat)
-          }, {
-            layer: layer._id,
-            lnglat: this.__withinBounds(-180, nwLat, seLng, seLat)
-          }]
-        }
-      } else {
-        query = {
-          layer: layer._id,
-          lnglat: this.__withinBounds(nwLng, nwLat, seLng, seLat)
-        }
-      }
-
-      return this.db.Point.find({
-        ...query,
-        $and: [
-          {'lnglat.coordinates.0': {$mod: [sampleFactor, 0]}},
-          {'lnglat.coordinates.1': {$mod: [sampleFactor, 0]}}
-        ]
+      .findOne(dsCriteria)
+      .populate({
+        path: 'layers',
+        match: layerCriteria
       })
-    })
-    .then((points) => ({
-      dx: sampleFactor,
-      dy: sampleFactor,
-      bounds: [nwLng, nwLat, seLng, seLat],
-      points
-    }))
+      .sort({forecastedDate: 1})
+      .then((dataSet) => {
+        if (!dataSet || !dataSet.layers || !dataSet.layers[0]) throw new Error('no DataSet found')
+        return dataSet.layers[0]
+      })
+      .then((layer) => {
+        let query
+
+        if (nwLng > 0 && seLng < 0) {
+        // Bounding box goes over dateline, need to split into two boxes
+          query = {
+            $or: [{
+              layer: layer._id,
+              lnglat: this.__withinBounds(nwLng, nwLat, 180, seLat)
+            }, {
+              layer: layer._id,
+              lnglat: this.__withinBounds(-180, nwLat, seLng, seLat)
+            }]
+          }
+        } else {
+          query = {
+            layer: layer._id,
+            lnglat: this.__withinBounds(nwLng, nwLat, seLng, seLat)
+          }
+        }
+
+        return this.db.Point.find({
+          ...query,
+          $and: [
+            {'lnglat.coordinates.0': {$mod: [sampleFactor, 0]}},
+            {'lnglat.coordinates.1': {$mod: [sampleFactor, 0]}}
+          ]
+        })
+      })
+      .then((points) => ({
+        dx: sampleFactor,
+        dy: sampleFactor,
+        bounds: [nwLng, nwLat, seLng, seLat],
+        points
+      }))
   }
 
   __withinBounds (nwLng, nwLat, seLng, seLat) {
@@ -213,24 +213,24 @@ export default class MongooseQueryInterface extends QueryInterface {
     return this.db.DataSet.find({
       forecastedDate: {$lte: new Date(Date.now() - ttl)}
     })
-    .populate('layers')
-    .then((dataSets) => {
-      if (!dataSets) return
+      .populate('layers')
+      .then((dataSets) => {
+        if (!dataSets) return
 
-      let layerIds = []
-      let dsIds = []
-      dataSets.forEach((dataSet) => {
-        dsIds.push(dataSet._id)
-        dataSet.layers.forEach((layer) => {
-          layerIds.push(layer._id)
+        let layerIds = []
+        let dsIds = []
+        dataSets.forEach((dataSet) => {
+          dsIds.push(dataSet._id)
+          dataSet.layers.forEach((layer) => {
+            layerIds.push(layer._id)
+          })
         })
-      })
 
-      return this.db.Point.remove({
-        layer: {$in: layerIds}
+        return this.db.Point.remove({
+          layer: {$in: layerIds}
+        })
+          .then(() => this.db.Layer.remove({_id: {$in: layerIds}}))
+          .then(() => this.db.DataSet.remove({_id: {$in: dsIds}}))
       })
-      .then(() => this.db.Layer.remove({_id: {$in: layerIds}}))
-      .then(() => this.db.DataSet.remove({_id: {$in: dsIds}}))
-    })
   }
 }

@@ -12,14 +12,14 @@ export default function cleanup (options) {
 
   // Cleanup old downloaded files to free some disk space
   fs.readdirSync(downloaderTarget)
-  .forEach((file) => {
-    let filePath = path.join(downloaderTarget, file)
-    let stat = fs.statSync(filePath)
-    if ((now - stat.mtime.getTime()) > fileTTL) {
-      debug(`unlink ${filePath}`)
-      fs.unlinkSync(filePath)
-    }
-  })
+    .forEach((file) => {
+      let filePath = path.join(downloaderTarget, file)
+      let stat = fs.statSync(filePath)
+      if ((now - stat.mtime.getTime()) > fileTTL) {
+        debug(`unlink ${filePath}`)
+        fs.unlinkSync(filePath)
+      }
+    })
 
   // Cleanup old datasets
   return db.query.cleanupOldDataSets(dataSetTTL)
