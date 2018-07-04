@@ -1,7 +1,7 @@
 export default function formatter (server) {
   server.formatters['application/json'] = function (req, res, body, cb) {
     if (body instanceof Error) {
-      var err = body
+      const err = body
       // snoop for RestError or HttpError, but don't rely on
       // instanceof
       res.statusCode = body.statusCode || 500
@@ -23,7 +23,7 @@ export default function formatter (server) {
       body = body.toString('base64')
     }
 
-    var data = ''
+    let data = ''
     if (process.env.NODE_ENV === 'development') {
       data = JSON.stringify(body, null, 2)
     } else {

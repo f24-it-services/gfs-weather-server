@@ -1,5 +1,6 @@
 node_modules/
+grib2json/
 config/
 *.tgz
-config.json
 *.log
+config.json

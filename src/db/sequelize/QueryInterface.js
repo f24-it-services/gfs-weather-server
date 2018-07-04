@@ -12,7 +12,7 @@ export default class SequelizeQueryInterface extends QueryInterface {
     return this.db.DataSet.findOne({
       order: [['generated_date', 'DESC']]
     })
-    .then((dataSet) => dataSet && dataSet.generatedDate)
+      .then((dataSet) => dataSet && dataSet.generatedDate)
   }
 
   findOrUpsertDataSet (values) {
@@ -20,13 +20,13 @@ export default class SequelizeQueryInterface extends QueryInterface {
       where: {forecastedDate: values.forecastedDate},
       defaults: values
     })
-    .spread(function (dataSet, created) {
-      if (created) {
-        return dataSet
-      } else {
-        return dataSet.updateAttributes(values)
-      }
-    })
+      .spread(function (dataSet, created) {
+        if (created) {
+          return dataSet
+        } else {
+          return dataSet.updateAttributes(values)
+        }
+      })
   }
 
   findOrUpsertLayer (dataSet, descriptor, grid) {
@@ -40,41 +40,41 @@ export default class SequelizeQueryInterface extends QueryInterface {
       where: values,
       defaults: values
     })
-    .spread((layer, created) => {
-      if (created) {
-        return layer
-      } else {
-        return layer.updateAttributes(values).then((layer) => {
-          return this.db.Point.destroy({
-            where: {layer_id: layer.id}
+      .spread((layer, created) => {
+        if (created) {
+          return layer
+        } else {
+          return layer.updateAttributes(values).then((layer) => {
+            return this.db.Point.destroy({
+              where: {layer_id: layer.id}
+            })
+              .then(() => layer)
           })
-          .then(() => layer)
-        })
-      }
-    })
-    .then((layer) => {
-      return this.createInserter('weather.points', ['layer_id', 'lnglat', 'value'])
-      .then((inserter) => {
-        return new Promise((resolve, reject) => {
-          grid.forEach((value, x, y) => {
-            if (!value) return
-            let [lng, lat] = grid.lnglat(x, y)
-            inserter.push({
-              layer_id: layer.id,
-              lnglat: `SRID=4326;POINT(${lng} ${lat})`,
-              value: `{${value.join ? value.join(',') : value}}`
+        }
+      })
+      .then((layer) => {
+        return this.createInserter('weather.points', ['layer_id', 'lnglat', 'value'])
+          .then((inserter) => {
+            return new Promise((resolve, reject) => {
+              grid.forEach((value, x, y) => {
+                if (!value) return
+                let [lng, lat] = grid.lnglat(x, y)
+                inserter.push({
+                  layer_id: layer.id,
+                  lnglat: `SRID=4326;POINT(${lng} ${lat})`,
+                  value: `{${value.join ? value.join(',') : value}}`
+                })
+              })
+
+              inserter.setEndHandler((err) => {
+                if (err) return reject(err)
+                resolve()
+              })
+
+              inserter.end()
             })
           })
-
-          inserter.setEndHandler((err) => {
-            if (err) return reject(err)
-            resolve()
-          })
-
-          inserter.end()
-        })
       })
-    })
   }
 
   createInserter (table, columns) {
@@ -129,7 +129,7 @@ export default class SequelizeQueryInterface extends QueryInterface {
       args.push(lng, lat)
       return `(ST_X(lnglat) = ? AND ST_Y(lnglat) = ?)`
     })
-    .join(' OR ')
+      .join(' OR ')
 
     let query = {
       where: dsCriteria,

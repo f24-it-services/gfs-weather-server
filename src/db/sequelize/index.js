@@ -14,11 +14,11 @@ export function bootstrap () {
   )
 
   'DataSet Layer Point'
-  .split(' ')
-  .forEach((file) => {
-    const model = db.sequelize.import('./' + file)
-    db[model.name] = model
-  })
+    .split(' ')
+    .forEach((file) => {
+      const model = db.sequelize.import('./' + file)
+      db[model.name] = model
+    })
 
   db.DataSet.hasMany(db.Layer, {as: 'layers'})
   db.Layer.hasMany(db.Point, {as: 'points'})
