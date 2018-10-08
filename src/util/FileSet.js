@@ -1,5 +1,5 @@
 import debugFactory from 'debug'
-import {GridFactory, GridSet, sequence} from 'gfs-weather-utils'
+import { GridFactory, GridSet, sequence } from 'gfs-weather-utils'
 import grib2json from 'grib2json'
 
 const debug = debugFactory('gfs.fileset')
@@ -25,7 +25,7 @@ export default class FileSet {
     }
   }
 
-  findFile ({name, surface, date, forecast}) {
+  findFile ({ name, surface, date, forecast }) {
     return this.files.find((item) => {
       let matched = true
       if (name && name !== item.name) matched = false
@@ -39,7 +39,7 @@ export default class FileSet {
   readFile (file) {
     debug(`Attempt to read json name=${file.name}`)
 
-    let gribOptions = {names: false, data: true}
+    let gribOptions = { names: false, data: true }
 
     return new Promise((resolve, reject) => {
       debug(`Read ${file.file}`)

@@ -22,8 +22,8 @@ export default {
     if (lo1 === lo2) lo2 = wrapLng(lo2 + 1)
 
     return db.query.findPointsByCoords(
-      {forecastedDate: {$gte: startDate}},
-      {$or: layers},
+      { forecastedDate: { $gte: startDate } },
+      { $or: layers },
       [[lo1, la1], [lo2, la1], [lo1, la2], [lo2, la2]],
       false
     )

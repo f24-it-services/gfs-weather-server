@@ -1,9 +1,9 @@
 import path from 'path'
 import restify from 'restify'
-import {argv} from 'yargs'
+import { argv } from 'yargs'
 
 import Config from './Config'
-import {bootstrap} from './db'
+import { bootstrap } from './db'
 import * as routes from './api/routes'
 import plugins from './api/plugins'
 

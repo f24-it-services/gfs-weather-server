@@ -17,7 +17,7 @@ export default class SequelizeQueryInterface extends QueryInterface {
 
   findOrUpsertDataSet (values) {
     return this.db.DataSet.findOrCreate({
-      where: {forecastedDate: values.forecastedDate},
+      where: { forecastedDate: values.forecastedDate },
       defaults: values
     })
       .spread(function (dataSet, created) {
@@ -46,7 +46,7 @@ export default class SequelizeQueryInterface extends QueryInterface {
         } else {
           return layer.updateAttributes(values).then((layer) => {
             return this.db.Point.destroy({
-              where: {layer_id: layer.id}
+              where: { layer_id: layer.id }
             })
               .then(() => layer)
           })
@@ -151,7 +151,7 @@ export default class SequelizeQueryInterface extends QueryInterface {
 
   cleanupOldDataSets (ttl) {
     return this.db.DataSet.destroy({
-      where: {forecastedDate: {$lte: new Date(Date.now() - ttl)}}
+      where: { forecastedDate: { $lte: new Date(Date.now() - ttl) } }
     })
   }
 }

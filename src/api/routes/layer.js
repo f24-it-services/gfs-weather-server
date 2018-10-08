@@ -1,4 +1,4 @@
-import {cacheControl, forecast, layer, sendJson, sendError, sendBuffer, sendErrorBuffer} from '../middleware'
+import { cacheControl, forecast, layer, sendJson, sendError, sendBuffer, sendErrorBuffer } from '../middleware'
 
 const CACHE_CONTROL_MAX_AGE = 3 * 3600 // 3hours
 

@@ -1,1 +1,1 @@
-export {default as layer} from './layer'
+export { default as layer } from './layer'

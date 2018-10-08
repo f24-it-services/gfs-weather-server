@@ -20,8 +20,8 @@ export function bootstrap () {
       db[model.name] = model
     })
 
-  db.DataSet.hasMany(db.Layer, {as: 'layers'})
-  db.Layer.hasMany(db.Point, {as: 'points'})
+  db.DataSet.hasMany(db.Layer, { as: 'layers' })
+  db.Layer.hasMany(db.Point, { as: 'points' })
 
   db.query = new QueryInterface(db)
 

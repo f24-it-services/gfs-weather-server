@@ -12,7 +12,7 @@ export default {
     bounds[2] = wrapLng(bounds[2])
     bounds[3] = wrapLat(bounds[3])
 
-    return db.query.findGrid({forecastedDate}, {name: layerName}, bounds, sampleFactor)
+    return db.query.findGrid({ forecastedDate }, { name: layerName }, bounds, sampleFactor)
       .then((grid) => {
         let features = grid.points.map((point) => ({
           type: 'Feature',

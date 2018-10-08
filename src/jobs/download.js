@@ -1,7 +1,7 @@
 import debugFactory from 'debug'
-import {Downloader} from 'gfs-downloader'
-import {sequence} from 'gfs-weather-utils'
-import {argv} from 'yargs'
+import { Downloader } from 'gfs-downloader'
+import { sequence } from 'gfs-weather-utils'
+import { argv } from 'yargs'
 
 import db from '../db'
 import FileSet from '../util/FileSet'
@@ -15,7 +15,7 @@ export default function download (options) {
    * @return {Promise}
    */
   let start = (startDate) => {
-    const config = Object.assign({}, options, {fields: []})
+    const config = Object.assign({}, options, { fields: [] })
     options.fields.forEach((field) => {
       if (typeof field.name === 'string') {
         config.fields.push(field)
@@ -96,7 +96,7 @@ export default function download (options) {
 function expandDescriptors (field) {
   let fields = []
   field.name.forEach((name) => {
-    fields.push(Object.assign({}, field, {name}))
+    fields.push(Object.assign({}, field, { name }))
   })
   return fields
 }
@@ -124,7 +124,7 @@ function combineFields (field, dataSet, fileSet) {
   return fileSet.selectMany.apply(fileSet, expandDescriptors(field))
     .then((grids) => {
       debug(`Combine ${field.name} to ${field.combinedName}`)
-      const descriptor = Object.assign({}, field, {name: field.combinedName})
+      const descriptor = Object.assign({}, field, { name: field.combinedName })
       return db.query.findOrUpsertLayer(dataSet, descriptor, grids.combine())
     })
 }

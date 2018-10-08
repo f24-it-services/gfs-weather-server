@@ -6,7 +6,7 @@ import Layer from './Layer'
 import Point from './Point'
 import QueryInterface from './QueryInterface'
 
-const db = {DataSet, Layer, Point}
+const db = { DataSet, Layer, Point }
 
 export default db
 

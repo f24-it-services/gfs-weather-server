@@ -9,7 +9,7 @@ export default class MongooseQueryInterface extends QueryInterface {
   findLatestGeneratedDate () {
     return this.db.DataSet
       .findOne()
-      .sort({generatedDate: -1})
+      .sort({ generatedDate: -1 })
       .then((res) => {
         return res && res.generatedDate
       })
@@ -17,9 +17,9 @@ export default class MongooseQueryInterface extends QueryInterface {
 
   findOrUpsertDataSet (values) {
     return this.db.DataSet.findOneAndUpdate(
-      {forecastedDate: values.forecastedDate},
+      { forecastedDate: values.forecastedDate },
       values,
-      {upsert: true, new: true}
+      { upsert: true, new: true }
     )
   }
 
@@ -34,7 +34,7 @@ export default class MongooseQueryInterface extends QueryInterface {
       this.db.Layer.findOneAndUpdate(
         values,
         values,
-        {upsert: true, new: true, passRawResult: true},
+        { upsert: true, new: true, passRawResult: true },
         (err, layer, res) => {
           if (err) return reject(err)
           if (res && res.lastErrorObject && res.lastErrorObject.updatedExisting) {
@@ -50,14 +50,14 @@ export default class MongooseQueryInterface extends QueryInterface {
       )
     })
       .then((layer) => {
-        return this.db.Point.remove({layer: layer._id})
+        return this.db.Point.remove({ layer: layer._id })
           .then(() => layer)
       })
       .then((layer) =>
         this.db.Point.collection.insert(
           grid.map((value, x, y) => ({
             layer: layer._id,
-            lnglat: {type: 'Point', coordinates: grid.lnglat(x, y)},
+            lnglat: { type: 'Point', coordinates: grid.lnglat(x, y) },
             value: value
           }))
         )
@@ -81,13 +81,13 @@ export default class MongooseQueryInterface extends QueryInterface {
     if (Array.isArray(criteria)) {
       withLayers = {
         $or: criteria.map((c) => ({
-          layer: {$in: Object.keys(map)},
+          layer: { $in: Object.keys(map) },
           lnglat: c
         }))
       }
     } else {
       withLayers = {
-        layer: {$in: Object.keys(map)},
+        layer: { $in: Object.keys(map) },
         lnglat: criteria
       }
     }
@@ -112,7 +112,7 @@ export default class MongooseQueryInterface extends QueryInterface {
         path: 'layers',
         match: layerCriteria
       })
-      .sort({forecastedDate: 1})
+      .sort({ forecastedDate: 1 })
       .then((dataSets) => this.__populatePoints(dataSets, pointCriteria))
   }
 
@@ -131,7 +131,7 @@ export default class MongooseQueryInterface extends QueryInterface {
         path: 'layers',
         match: layerCriteria
       })
-      .sort({forecastedDate: 1})
+      .sort({ forecastedDate: 1 })
       .then((dataSet) => {
         if (!dataSet || !dataSet.layers || !dataSet.layers[0]) throw new Error('no DataSet found')
         return dataSet.layers[0]
@@ -160,8 +160,8 @@ export default class MongooseQueryInterface extends QueryInterface {
         return this.db.Point.find({
           ...query,
           $and: [
-            {'lnglat.coordinates.0': {$mod: [sampleFactor, 0]}},
-            {'lnglat.coordinates.1': {$mod: [sampleFactor, 0]}}
+            { 'lnglat.coordinates.0': { $mod: [sampleFactor, 0] } },
+            { 'lnglat.coordinates.1': { $mod: [sampleFactor, 0] } }
           ]
         })
       })
@@ -211,7 +211,7 @@ export default class MongooseQueryInterface extends QueryInterface {
 
   cleanupOldDataSets (ttl) {
     return this.db.DataSet.find({
-      forecastedDate: {$lte: new Date(Date.now() - ttl)}
+      forecastedDate: { $lte: new Date(Date.now() - ttl) }
     })
       .populate('layers')
       .then((dataSets) => {
@@ -227,10 +227,10 @@ export default class MongooseQueryInterface extends QueryInterface {
         })
 
         return this.db.Point.remove({
-          layer: {$in: layerIds}
+          layer: { $in: layerIds }
         })
-          .then(() => this.db.Layer.remove({_id: {$in: layerIds}}))
-          .then(() => this.db.DataSet.remove({_id: {$in: dsIds}}))
+          .then(() => this.db.Layer.remove({ _id: { $in: layerIds } }))
+          .then(() => this.db.DataSet.remove({ _id: { $in: dsIds } }))
       })
   }
 }

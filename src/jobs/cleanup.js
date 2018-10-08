@@ -7,7 +7,7 @@ import db from '../db'
 const debug = debugFactory('gfs.cron.cleanup')
 
 export default function cleanup (options) {
-  let {fileTTL, dataSetTTL, downloaderTarget} = options
+  let { fileTTL, dataSetTTL, downloaderTarget } = options
   let now = Date.now()
 
   // Cleanup old downloaded files to free some disk space

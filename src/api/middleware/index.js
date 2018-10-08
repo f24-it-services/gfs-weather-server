@@ -24,7 +24,7 @@ export function forecast (req, res, next) {
 
   layers = layers.map((layer) => {
     let [name, surface] = layer.split('@')
-    return {name, surface}
+    return { name, surface }
   })
 
   let fromDate = new Date(parseInt(req.query.from))
