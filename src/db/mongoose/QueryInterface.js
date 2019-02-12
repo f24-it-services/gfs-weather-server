@@ -50,11 +50,11 @@ export default class MongooseQueryInterface extends QueryInterface {
       )
     })
       .then((layer) => {
-        return this.db.Point.remove({ layer: layer._id })
+        return this.db.Point.deleteOne({ layer: layer._id })
           .then(() => layer)
       })
       .then((layer) =>
-        this.db.Point.collection.insert(
+        this.db.Point.collection.insertMany(
           grid.map((value, x, y) => ({
             layer: layer._id,
             lnglat: { type: 'Point', coordinates: grid.lnglat(x, y) },
@@ -226,11 +226,11 @@ export default class MongooseQueryInterface extends QueryInterface {
           })
         })
 
-        return this.db.Point.remove({
+        return this.db.Point.deleteOne({
           layer: { $in: layerIds }
         })
-          .then(() => this.db.Layer.remove({ _id: { $in: layerIds } }))
-          .then(() => this.db.DataSet.remove({ _id: { $in: dsIds } }))
+          .then(() => this.db.Layer.deleteOne({ _id: { $in: layerIds } }))
+          .then(() => this.db.DataSet.deleteOne({ _id: { $in: dsIds } }))
       })
   }
 }

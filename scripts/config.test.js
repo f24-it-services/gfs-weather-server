@@ -25,7 +25,12 @@ var config = {
   },
   db: 'mongoose', // database driver for mongo-db
   mongoose: {
-    connString: DATABASE_URL // database URL
+    connString: DATABASE_URL, // database URL
+    options: {
+      useNewUrlParser: true,
+      useCreateIndex: true,
+      useFindAndModify: false
+    }
   },
   crontab: {
     cleanup: { // cleanup dates
