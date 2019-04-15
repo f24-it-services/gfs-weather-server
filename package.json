@@ -1,6 +1,6 @@
 {
   "name": "gfs-weather-server",
-  "version": "2.2.0-0",
+  "version": "2.2.0",
   "description": "Backend for downloading, storing and serving meteorological data.",
   "keywords": [],
   "homepage": "https://github.com/f24-it-services/gfs-weather-server#readme",
