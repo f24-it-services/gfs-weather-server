@@ -1,0 +1,4 @@
+--require ./test/env.js
+--require @babel/register
+--check-leaks
+--exit

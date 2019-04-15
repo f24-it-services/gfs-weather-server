@@ -8,6 +8,38 @@ import FileSet from '../util/FileSet'
 
 const debug = debugFactory('gfs.cron.downloader')
 
+/**
+ * @typedef {Object} Field
+ * @property {String|String[]} name - name of field(s)
+ * @property {String} [combinedName] - combined name of fields
+ * @property {String} surface - 'surface|x m above ground' height of field
+ * @property {Number} [resolution]
+ * @property {(String|Number)[]} [process]
+ * @example
+ * { // Wind speed at 10m above ground
+ *   name: ['UGRD', 'VGRD'],
+ *   combinedName: 'UVGRD',
+ *   surface: '10 m above ground',
+ *   resolution: 1
+ * }, { // Temperature at 2m above ground
+ *   name: 'TMP',
+ *   surface: '2 m above ground',
+ *   resolution: 1
+ * }, { // Precipitation on surface
+ *   name: 'PRATE',
+ *   surface: 'surface',
+ *   process: ['to-regular', 90, 0, 1, 1, 360, 181]
+ * }
+ */
+
+/**
+ * Download fields
+ * @param {Path} options.target - download path '/tmp/gfs-downloader',
+ * @param {Number} options.forecastStart - number of hours to start with 0,
+ * @param {Number} options.forecastEnd: 1, // number of hours to download (3days)
+ * @param {Field[]} options.fields - GFS fields to download
+ * @param {Date} [options.date] - Start date for download
+ */
 export default function download (options) {
   /**
    * Utility function to start the downloader process
@@ -30,12 +62,13 @@ export default function download (options) {
   // Start the updated based on either the date given via CLI or the newest
   // previously loaded data set
   let promise
-  if (argv.date) {
+  const _date = argv.date || options.date
+  if (_date) {
     // If a date is given via CLI, we look for a data set matching the given
     // day and hour
-    let date = new Date(Date.parse(argv.date))
+    let date = new Date(Date.parse(_date))
     if (isNaN(date.getTime())) {
-      return console.error(`Invalid date ${argv.date}`) // eslint-disable-line no-console
+      return console.error(`Invalid date ${_date}`) // eslint-disable-line no-console
     }
     promise = start(date)
   } else {

@@ -53,15 +53,15 @@ export default class MongooseQueryInterface extends QueryInterface {
         return this.db.Point.deleteOne({ layer: layer._id })
           .then(() => layer)
       })
-      .then((layer) =>
-        this.db.Point.collection.insertMany(
+      .then((layer) => {
+        return this.db.Point.collection.insertMany(
           grid.map((value, x, y) => ({
             layer: layer._id,
             lnglat: { type: 'Point', coordinates: grid.lnglat(x, y) },
             value: value
           }))
         )
-      )
+      })
   }
 
   __populatePoints (dataSets, criteria) {
@@ -209,7 +209,7 @@ export default class MongooseQueryInterface extends QueryInterface {
     return this.__findPoints(dsCriteria, layerCriteria, pointCriteria, fetchOne)
   }
 
-  cleanupOldDataSets (ttl) {
+  cleanupOldDataSets (ttl = 0) {
     return this.db.DataSet.find({
       forecastedDate: { $lte: new Date(Date.now() - ttl) }
     })
@@ -226,7 +226,7 @@ export default class MongooseQueryInterface extends QueryInterface {
           })
         })
 
-        return this.db.Point.deleteOne({
+        return this.db.Point.deleteMany({
           layer: { $in: layerIds }
         })
           .then(() => this.db.Layer.deleteOne({ _id: { $in: layerIds } }))
