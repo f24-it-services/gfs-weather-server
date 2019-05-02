@@ -1,4 +1,7 @@
 import QueryInterface from '../QueryInterface'
+import debugFactory from 'debug'
+
+const debug = debugFactory('gfs.query')
 
 export default class MongooseQueryInterface extends QueryInterface {
   constructor (db) {
@@ -225,12 +228,27 @@ export default class MongooseQueryInterface extends QueryInterface {
             layerIds.push(layer._id)
           })
         })
+        debug('cleanup:layerIds %j', layerIds)
 
+        const results = []
         return this.db.Point.deleteMany({
           layer: { $in: layerIds }
         })
+          .then(result => {
+            results.push(result)
+            debug('cleanup:Point.deleteMany %j', result)
+          })
           .then(() => this.db.Layer.deleteOne({ _id: { $in: layerIds } }))
+          .then(result => {
+            results.push(result)
+            debug('cleanup:Layer.deleteOne %j', result)
+          })
           .then(() => this.db.DataSet.deleteOne({ _id: { $in: dsIds } }))
+          .then(result => {
+            results.push(result)
+            debug('cleanup:DataSet.deleteOne %j', result)
+            return results
+          })
       })
   }
 }

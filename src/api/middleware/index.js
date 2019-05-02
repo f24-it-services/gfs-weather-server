@@ -54,7 +54,7 @@ export function layer (req, res, next) {
       res.body = geoJSON || {}
       next()
     }, (err) => {
-      debug('error', err)
+      debug('error %s', err)
       next(err)
     })
 }

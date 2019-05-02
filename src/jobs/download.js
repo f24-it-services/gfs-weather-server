@@ -87,7 +87,8 @@ export default function download (options) {
   //
   return promise.then(([files, generatedDate]) => {
     if (files === null) {
-      return debug('No new files found')
+      debug('No new files found')
+      return
     }
     let dataSets = {}
 
