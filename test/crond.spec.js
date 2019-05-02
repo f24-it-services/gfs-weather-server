@@ -37,8 +37,9 @@ describe('gfs-crond', function () {
     it('shall cleanup data', function () {
       const { options } = config.crontab.cleanup
       return cleanup(options)
-        .then(() => {
-
+        .then((results) => {
+          assert.ok(Array.isArray(results), 'shall be an array')
+          assert.ok(results[0].deletedCount >= 60000, 'shall delete more than 60000 points')
         })
         .catch(err => {
           assert.ok(err, err)
