@@ -1,3 +1,4 @@
+import _pick from 'lodash.pick'
 import QueryInterface from '../QueryInterface'
 import debugFactory from 'debug'
 
@@ -238,15 +239,20 @@ export default class MongooseQueryInterface extends QueryInterface {
             results.push(result)
             debug('cleanup:Point.deleteMany %j', result)
           })
-          .then(() => this.db.Layer.deleteOne({ _id: { $in: layerIds } }))
+          .then(() => this.db.Layer.deleteMany({ _id: { $in: layerIds } }))
           .then(result => {
             results.push(result)
-            debug('cleanup:Layer.deleteOne %j', result)
+            debug('cleanup:Layer.deleteMany %j', result)
           })
-          .then(() => this.db.DataSet.deleteOne({ _id: { $in: dsIds } }))
+          .then(() => this.db.DataSet.deleteMany({ _id: { $in: dsIds } }))
           .then(result => {
             results.push(result)
-            debug('cleanup:DataSet.deleteOne %j', result)
+            debug('cleanup:DataSet.deleteMany %j', result)
+          })
+          .then(() => this.db.Point.collection.stats())
+          .then(stats => {
+            const _stats = _pick(stats, 'ns size count storageSize ok totalIndexSize indexSizes'.split(' '))
+            debug('cleanup:Point.collection.stats %j', _stats)
             return results
           })
       })
