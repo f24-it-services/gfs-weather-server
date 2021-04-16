@@ -46,7 +46,7 @@ export default function download (options) {
    * @param  {Date} startDate
    * @return {Promise}
    */
-  let start = (startDate) => {
+  const start = (startDate) => {
     const config = Object.assign({}, options, { fields: [] })
     options.fields.forEach((field) => {
       if (typeof field.name === 'string') {
@@ -66,7 +66,7 @@ export default function download (options) {
   if (_date) {
     // If a date is given via CLI, we look for a data set matching the given
     // day and hour
-    let date = new Date(Date.parse(_date))
+    const date = new Date(Date.parse(_date))
     if (isNaN(date.getTime())) {
       return console.error(`Invalid date ${_date}`) // eslint-disable-line no-console
     }
@@ -90,7 +90,7 @@ export default function download (options) {
       debug('No new files found')
       return
     }
-    let dataSets = {}
+    const dataSets = {}
 
     files.forEach((file) => {
       if (!dataSets[file.forecast]) {
@@ -102,7 +102,7 @@ export default function download (options) {
 
     return sequence(Object.keys(dataSets).map((forecast) => () => {
       debug(`Creating dataset for date=${generatedDate} forecast=${forecast}`)
-      let values = {
+      const values = {
         generatedDate,
         forecastedDate: new Date(+generatedDate + forecast * 3600000)
       }
@@ -116,7 +116,7 @@ export default function download (options) {
     // import and conversion tasks
     //
       .then((dataSets) => {
-        let tasks = []
+        const tasks = []
 
         dataSets.forEach(([dataSet, fileSet]) => {
           createTasks(tasks, dataSet, fileSet, options.fields)
@@ -128,7 +128,7 @@ export default function download (options) {
 }
 
 function expandDescriptors (field) {
-  let fields = []
+  const fields = []
   field.name.forEach((name) => {
     fields.push(Object.assign({}, field, { name }))
   })
@@ -164,10 +164,10 @@ function combineFields (field, dataSet, fileSet) {
 }
 
 function convertGrid (field, dataSet, fileSet) {
-  let args = field.process.slice(1)
+  const args = field.process.slice(1)
   return fileSet.select(field).then((grid) => {
     debug(`Convert ${field.name} to regular with ${args}`)
-    let regularGrid = grid.scaleToRegular.apply(grid, args)
+    const regularGrid = grid.scaleToRegular.apply(grid, args)
     return db.query.findOrUpsertLayer(dataSet, field, regularGrid)
   })
 }

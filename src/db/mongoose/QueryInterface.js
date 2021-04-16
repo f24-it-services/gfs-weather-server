@@ -28,7 +28,7 @@ export default class MongooseQueryInterface extends QueryInterface {
   }
 
   findOrUpsertLayer (dataSet, descriptor, grid) {
-    let values = {
+    const values = {
       dataSet: dataSet._id,
       name: descriptor.name.toLowerCase(),
       surface: descriptor.surface
@@ -69,7 +69,7 @@ export default class MongooseQueryInterface extends QueryInterface {
   }
 
   __populatePoints (dataSets, criteria) {
-    let map = {}
+    const map = {}
 
     if (dataSets === null) {
       return []
@@ -99,7 +99,7 @@ export default class MongooseQueryInterface extends QueryInterface {
     return this.db.Point.find(withLayers)
       .then((points) => {
         points.forEach((point) => {
-          let layer = map[point.layer]
+          const layer = map[point.layer]
           if (!layer.points) layer.points = []
           layer.points.push(point)
         })
@@ -221,8 +221,8 @@ export default class MongooseQueryInterface extends QueryInterface {
       .then((dataSets) => {
         if (!dataSets) return
 
-        let layerIds = []
-        let dsIds = []
+        const layerIds = []
+        const dsIds = []
         dataSets.forEach((dataSet) => {
           dsIds.push(dataSet._id)
           dataSet.layers.forEach((layer) => {

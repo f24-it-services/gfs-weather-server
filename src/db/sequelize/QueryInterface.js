@@ -58,7 +58,7 @@ export default class SequelizeQueryInterface extends QueryInterface {
             return new Promise((resolve, reject) => {
               grid.forEach((value, x, y) => {
                 if (!value) return
-                let [lng, lat] = grid.lnglat(x, y)
+                const [lng, lat] = grid.lnglat(x, y)
                 inserter.push({
                   layer_id: layer.id,
                   lnglat: `SRID=4326;POINT(${lng} ${lat})`,
@@ -82,7 +82,7 @@ export default class SequelizeQueryInterface extends QueryInterface {
     const connString = `${config.options.dialect}://${config.user}:${config.password}@${config.options.host}:${config.options.port}/${config.database}`
 
     return new Promise((resolve, reject) => {
-      let inserter = dbStreamer.getInserter({
+      const inserter = dbStreamer.getInserter({
         dbConnString: connString,
         tableName: table,
         columns: columns
@@ -96,9 +96,9 @@ export default class SequelizeQueryInterface extends QueryInterface {
   }
 
   findGrid (dsCriteria, layerCriteria, bounds, sampleFactor) {
-    let [nwLng, nwLat, seLng, seLat] = bounds
+    const [nwLng, nwLat, seLng, seLat] = bounds
 
-    let query = {
+    const query = {
       where: dsCriteria,
       include: [{
         model: this.db.Layer,
@@ -107,7 +107,7 @@ export default class SequelizeQueryInterface extends QueryInterface {
         include: [{
           model: this.db.Point,
           as: 'points',
-          where: [`lnglat && ?::geography AND MOD(ST_X(lnglat)::numeric, ?) = 0 AND MOD(ST_Y(lnglat)::numeric, ?) = 0`, `POLYGON((${nwLng} ${nwLat},${seLng} ${nwLat},${seLng} ${seLat},${nwLng} ${seLat},${nwLng} ${nwLat}))`, sampleFactor, sampleFactor]
+          where: ['lnglat && ?::geography AND MOD(ST_X(lnglat)::numeric, ?) = 0 AND MOD(ST_Y(lnglat)::numeric, ?) = 0', `POLYGON((${nwLng} ${nwLat},${seLng} ${nwLat},${seLng} ${seLat},${nwLng} ${seLat},${nwLng} ${nwLat}))`, sampleFactor, sampleFactor]
         }]
       }],
       order: [['forecastedDate', 'ASC']]
@@ -124,14 +124,14 @@ export default class SequelizeQueryInterface extends QueryInterface {
   }
 
   findPointsByCoords (dsCriteria, layerCriteria, points, fetchOne = false) {
-    let args = []
-    let where = points.map(([lng, lat]) => {
+    const args = []
+    const where = points.map(([lng, lat]) => {
       args.push(lng, lat)
-      return `(ST_X(lnglat) = ? AND ST_Y(lnglat) = ?)`
+      return '(ST_X(lnglat) = ? AND ST_Y(lnglat) = ?)'
     })
       .join(' OR ')
 
-    let query = {
+    const query = {
       where: dsCriteria,
       include: [{
         model: this.db.Layer,

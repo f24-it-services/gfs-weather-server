@@ -14,7 +14,7 @@ export default {
 
     return db.query.findGrid({ forecastedDate }, { name: layerName }, bounds, sampleFactor)
       .then((grid) => {
-        let features = grid.points.map((point) => ({
+        const features = grid.points.map((point) => ({
           type: 'Feature',
           geometry: point.lnglat.toJSON ? point.lnglat.toJSON() : point.lnglat,
           properties: {

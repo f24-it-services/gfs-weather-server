@@ -1,6 +1,6 @@
 // this function cannot merge arrays
 function merge (to, from) {
-  for (var p in from) {
+  for (const p in from) {
     if (typeof from[p] === 'object') {
       if (!to[p]) to[p] = {}
       to[p] = merge(to[p], from[p])
@@ -11,15 +11,15 @@ function merge (to, from) {
   return to
 }
 
-var DATABASE_URL = process.env.DATABASE_URL || 'mongodb://localhost/gfs'
-var envConfig = {}
+const DATABASE_URL = process.env.DATABASE_URL || 'mongodb://localhost/gfs'
+let envConfig = {}
 
 if (process.env.NODE_CONFIG) {
   envConfig = new Function('return ' + process.env.NODE_CONFIG)() // eslint-disable-line no-new-func
   console.log(envConfig)
 }
 
-var config = {
+const config = {
   server: { // server port - not used here
     port: '8080'
   },

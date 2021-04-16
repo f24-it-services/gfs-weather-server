@@ -14,6 +14,7 @@
   "license": "MIT",
   "author": "Johannes Klose <jklose@calitrix.com>",
   "main": "lib/index.js",
+  "module": "src/index.js",
   "bin": {
     "gfs-weather-crond": "bin/gfs-weather-crond.js",
     "gfs-weather-server": "bin/gfs-weather-server.js"
@@ -32,7 +33,7 @@
     "prepublishOnly": "npm run all",
     "start": "node lib/server.js",
     "start:dev": "NODE_ENV=development DEBUG=gfs* nodemon --watch src -- -r 'babel-register' src/server.js",
-    "test": "DEBUG=gfs* mocha",
+    "test": "DEBUG=gfs* mocha -r esm",
     "test:script": "./scripts/crond-test.sh",
     "watch": "npm run build -- --watch"
   },
@@ -51,45 +52,46 @@
       "mocha": true
     },
     "extends": "standard",
-    "plugins": [
-      "standard"
-    ]
+    "plugins": [],
+    "rules": {
+      "node/no-path-concat": "warn"
+    }
   },
   "dependencies": {
     "db-streamer": "^1.2.1",
-    "geobuf": "^3.0.1",
-    "gfs-downloader": "^1.1.4",
+    "geobuf": "^3.0.2",
+    "gfs-downloader": "^1.1.5",
     "gfs-weather-utils": "^1.1.1",
-    "glob": "^7.1.4",
+    "glob": "^7.1.6",
     "grib2json": "^1.0.2",
     "lodash.pick": "^4.4.0",
-    "mongoose": "^5.6.0",
-    "node-cron": "^2.0.3",
-    "nodemon": "^1.19.1",
-    "pbf": "^3.2.0",
-    "pg": "^7.11.0",
-    "pg-copy-streams": "^2.2.0",
+    "mongoose": "^5.12.4",
+    "node-cron": "^3.0.0",
+    "nodemon": "^2.0.7",
+    "pbf": "^3.2.1",
+    "pg": "^8.6.0",
+    "pg-copy-streams": "^5.1.1",
     "pg-hstore": "^2.3.3",
-    "restify": "^8.3.3",
-    "sequelize": "^6.0.0",
-    "yargs": "^13.3.0"
+    "restify": "^8.5.1",
+    "sequelize": "^6.6.2",
+    "yargs": "^16.2.0"
   },
   "devDependencies": {
-    "@babel/cli": "^7.4.4",
-    "@babel/core": "^7.4.5",
-    "@babel/plugin-proposal-object-rest-spread": "^7.4.4",
-    "@babel/preset-env": "^7.4.5",
-    "@babel/register": "^7.4.4",
-    "eslint": "^6.0.0",
-    "eslint-config-standard": "^12.0.0",
-    "eslint-plugin-import": "^2.17.3",
-    "eslint-plugin-node": "^9.1.0",
-    "eslint-plugin-promise": "^4.1.1",
-    "eslint-plugin-standard": "^4.0.0",
-    "mocha": "^6.1.4",
-    "nodemon": "^1.19.1",
+    "@babel/cli": "^7.13.14",
+    "@babel/core": "^7.13.15",
+    "@babel/plugin-proposal-object-rest-spread": "^7.13.8",
+    "@babel/preset-env": "^7.13.15",
+    "@babel/register": "^7.13.14",
+    "eslint": "^7.24.0",
+    "eslint-config-standard": "^16.0.2",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^5.1.0",
+    "esm": "^3.2.25",
+    "mocha": "^8.3.2",
+    "nodemon": "^2.0.7",
     "npm-run-all": "^4.1.5",
-    "rimraf": "^2.6.3",
-    "shelljs": "^0.8.3"
+    "rimraf": "^3.0.2",
+    "shelljs": "^0.8.4"
   }
 }

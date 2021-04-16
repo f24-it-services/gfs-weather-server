@@ -8,7 +8,7 @@ import {
   disconnect as sequelizeDisconnect
 } from './sequelize'
 
-let db = {}
+const db = {}
 
 export default db
 

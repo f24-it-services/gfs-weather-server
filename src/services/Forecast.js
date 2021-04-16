@@ -12,9 +12,9 @@ const INTERVAL = 3
 
 export default {
   fetch (latlng, layers, startDate) {
-    let [lng, lat] = wrapLngLat([latlng[1], latlng[0]])
-    let la1 = wrapLat(Math.ceil(lat))
-    let lo1 = wrapLng(Math.floor(lng))
+    const [lng, lat] = wrapLngLat([latlng[1], latlng[0]])
+    const la1 = wrapLat(Math.ceil(lat))
+    const lo1 = wrapLng(Math.floor(lng))
     let la2 = wrapLat(Math.floor(lat))
     let lo2 = wrapLng(Math.ceil(lng))
 
@@ -28,8 +28,8 @@ export default {
       false
     )
       .then((dataSets) => {
-        let layerMap = {}
-        let layerKey = (layer) => `${layer.name}:${layer.surface}`
+        const layerMap = {}
+        const layerKey = (layer) => `${layer.name}:${layer.surface}`
         layers.forEach((layer) => {
           layerMap[layerKey(layer)] = {
             ...layer,
@@ -38,21 +38,21 @@ export default {
         })
 
         dataSets.forEach((dataSet) => {
-          let offset = Math.floor((dataSet.forecastedDate.getTime() - startDate.getTime()) / (INTERVAL * 3600000))
+          const offset = Math.floor((dataSet.forecastedDate.getTime() - startDate.getTime()) / (INTERVAL * 3600000))
           // Initialize all values at the current forecast offset with nulls
           layers.forEach((layer) => {
             layerMap[layerKey(layer)].values[offset] = null
           })
           // Set every value we received for the current offset to our layer map
           dataSet.layers.forEach((layer) => {
-            let data = []
+            const data = []
             layer.points.forEach((p) => {
-              let [lo, la] = p.lnglat.coordinates
-              let i = (la1 - la) * 2 + (lo - lo1)
+              const [lo, la] = p.lnglat.coordinates
+              const i = (la1 - la) * 2 + (lo - lo1)
               data[i] = p.value
             // console.log(i, lo, la, p.value, lo1, la1)
             })
-            let grid = new Grid(0, la1, lo1, 1, 1, 2, 2, data)
+            const grid = new Grid(0, la1, lo1, 1, 1, 2, 2, data)
             // console.log(lng, lat)
             // console.log(grid.interpolateAt(lat, lng))
             layerMap[layerKey(layer)].values[offset] = grid.interpolateAt(lat, lng)
@@ -72,7 +72,7 @@ export default {
   },
 
   bulkFetch (coordinates, layers, startDate) {
-    let result = {
+    const result = {
       start: startDate,
       interval: 3,
       forecasts: []

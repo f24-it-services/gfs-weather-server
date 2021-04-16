@@ -15,7 +15,7 @@ export default class FileSet {
   }
 
   select (descriptor) {
-    let file = this.findFile(descriptor)
+    const file = this.findFile(descriptor)
     if (file) {
       return this.readFile(file).then(GridFactory.fromJSON)
     } else {
@@ -39,7 +39,7 @@ export default class FileSet {
   readFile (file) {
     debug(`Attempt to read json name=${file.name}`)
 
-    let gribOptions = { names: false, data: true }
+    const gribOptions = { names: false, data: true }
 
     return new Promise((resolve, reject) => {
       debug(`Read ${file.file}`)

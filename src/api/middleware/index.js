@@ -23,13 +23,13 @@ export function forecast (req, res, next) {
   }
 
   layers = layers.map((layer) => {
-    let [name, surface] = layer.split('@')
+    const [name, surface] = layer.split('@')
     return { name, surface }
   })
 
-  let fromDate = new Date(parseInt(req.query.from))
-  let lat = parseFloat(req.query.lat)
-  let lng = parseFloat(req.query.lng)
+  const fromDate = new Date(parseInt(req.query.from))
+  const lat = parseFloat(req.query.lat)
+  const lng = parseFloat(req.query.lng)
 
   Forecast
     .fetch([lat, lng], layers, fromDate)
@@ -45,8 +45,8 @@ export function forecast (req, res, next) {
  */
 export function layer (req, res, next) {
   debug(`Get layer name=${req.params.name} date=${req.params.date} bounds=${req.query.bb}`)
-  let forecastedDate = new Date(parseInt(req.params.date))
-  let bounds = req.query.bb.split(',').map((c) => parseFloat(c))
+  const forecastedDate = new Date(parseInt(req.params.date))
+  const bounds = req.query.bb.split(',').map((c) => parseFloat(c))
 
   GridLoader
     .fetchGeoJSON(req.params.name, forecastedDate, bounds, parseInt(req.query.sf))
@@ -67,7 +67,7 @@ export function cacheControl (maxAge) {
 }
 
 export function sendBuffer (req, res, next) {
-  let buff = geobuf.encode(res.body, new Pbf())
+  const buff = geobuf.encode(res.body, new Pbf())
   res.setHeader('Content-Type', 'application/x-protobuf')
   res.send(Buffer.from(buff, 'binary'))
   next && next()
