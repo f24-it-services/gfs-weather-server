@@ -54,7 +54,7 @@
     "extends": "standard",
     "plugins": [],
     "rules": {
-      "node/no-path-concat": "warn"
+      "n/no-path-concat": "warn"
     }
   },
   "dependencies": {
@@ -62,7 +62,7 @@
     "geobuf": "^3.0.2",
     "gfs-downloader": "^1.2.0",
     "gfs-weather-utils": "^1.1.1",
-    "glob": "^7.2.3",
+    "glob": "^8.0.3",
     "grib2json": "^1.0.2",
     "lodash.pick": "^4.4.0",
     "mongoose": "^5.13.14",
@@ -70,11 +70,11 @@
     "nodemon": "^2.0.16",
     "pbf": "^3.2.1",
     "pg": "^8.7.3",
-    "pg-copy-streams": "^5.1.1",
+    "pg-copy-streams": "^6.0.2",
     "pg-hstore": "^2.3.4",
     "restify": "^8.6.1",
     "sequelize": "^6.20.1",
-    "yargs": "^16.2.0"
+    "yargs": "^17.5.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.17.10",
@@ -82,11 +82,11 @@
     "@babel/plugin-proposal-object-rest-spread": "^7.18.0",
     "@babel/preset-env": "^7.18.2",
     "@babel/register": "^7.17.7",
-    "eslint": "^7.32.0",
-    "eslint-config-standard": "^16.0.3",
+    "eslint": "^8.16.0",
+    "eslint-config-standard": "^17.0.0",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^5.2.0",
+    "eslint-plugin-promise": "^6.0.0",
     "esm": "^3.2.25",
     "mocha": "^8.4.0",
     "nodemon": "^2.0.16",
